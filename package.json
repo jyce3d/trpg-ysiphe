@@ -1,0 +1,15 @@
+{
+  "name": "trpghei",
+  "version": "1.0.0",
+  "description": "Text Role Playing Game - école d'ingé",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jyce3d",
+  "license": "ISC",
+  "dependencies": {
+    "readline": "^1.3.0",
+    "stdio": "^0.2.7"
+  }
+}
