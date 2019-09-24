@@ -49,7 +49,7 @@ Etage 1
 	["S_0_1", "Escalier", "Salle d'examen"],
 	["Bibliothèque", "Salle d'exposition", "Salle de Physique"]
 ];*/
-
+var curRoom=null;
 
 var arrRoom_0 = new Array(3);
 for (var i=0;i<3;i++) 
@@ -63,7 +63,7 @@ var curPerso = new Perso(0,1,0,"plone","", 5, 4, 0, 0);
 var rosaly = new Perso(0,2,0,"Rosaly","", 4,5,0,0);
 var annelo = new Perso(0,1,0,"Anne Laure", "Une jeune fille aux longs cheveux noirs de taille moyenne vous observe avec un regard interrogatif, légèrement narquois.", 5,2,0,0); 
 // gestion des combats
-var oponent = null;
+var oponent = annelo;
 var tourCourant = null;
 ///////
 var timeRef = Date.now();
@@ -73,48 +73,95 @@ arrRoom_0[1][1] = new S_1_1(timeRef);
 
 var recursiveAsyncReadLine = function (err) {
  // console.log('\033[2J');
-  if (oponent == null ) {
-  var curRoom;
-	if (curPerso.Z==0)
-		 curRoom=arrRoom_0[curPerso.Y][curPerso.X];
-	else
-		curRoom=arrRoom_0[curPerso.Y][curPerso.X];
-	curRoom.display(curPerso, err);
-	 console.log("Temps: " + tools.getTime(timeRef));
+ var att =0;
+ var def=0;
+ if (curPerso.Z==0)
+ curRoom=arrRoom_0[curPerso.Y][curPerso.X];
+else
+curRoom=arrRoom_1[curPerso.Y][curPerso.X];
 
-  rl.question('Command: ', function (err, answer) {
-    if (answer == 'exit' || answer== 'q' || answer=='quit') //we need some base case, for recursion
-	  return 1; //Exit the program
-	var err;
-		 err=curRoom.process(curPerso, answer);
- //   log('Got it! Your answer was: "', answer, '"');
-	recursiveAsyncReadLine(err); //Calling this function again to ask new question, only if answered
-  
-	  });
+curRoom.display(curPerso, err);
+console.log("Temps: " + tools.getTime(timeRef));
+  if (oponent == null ) {
+
+
 	} else {
-		curPerso.X=6;
-		curPerso.Y=1;
+		//curPerso.X=6;
+		//curPerso.Y=1;
 		console.log("MODE COMBAT");
 		console.log("===========");
-		if (tourCourant ==null)
+		if (tourCourant ==null) 
 			if (oponent.getMental() > curPerso.getMental()) {
 				tourCourant = oponent;
 			} else if (oponent.getMental() < curPerso.getMental() ){
 				tourCourant = curPerso;
 			} else if (oponent.getMental() == curPerso.getMental() ) {
-				var op=oponent.tossDice();
-				var cur=curPerso.tosDice();
+				var op=oponent.tossDiceMental();
+				var cur=curPerso.tossDiceMental();
 				while (op==cur) {
-					op=openent.tossDicePhysic();
-					cur=curPerso.tossDice();
+					op=openent.tossDiceMental();
+					cur=curPerso.tossDiceMental();
 				}
 				if (op>cur) 
 				 tourCourant = oponent;
 				else tourCourant = curPerso;
-			}
+		}
 			// tourCourant est défini
+		
 
+				
+		if (tourCourant==curPerso) {
+			att=curPerso._actionPhysic();
+			console.log("Vous lancez votre attaque:" + att );
+			def=oponent._actionPhysic();
+			console.log("Votre adversaire esquive à " + def);
+			if (att>def) {
+				oponent.plaie= oponent.plaie + (att-def);
+				console.log("Vous infligé " + att-def+ "à votre adversaire");
+			} else 
+				console.log("Votre adversaire esquive votre attaque");
+			if (oponent.plaie>oponent.physic) {
+				console.log("Votre adversaier ne se relève pas et est bon pour l'infirmerie");
+				oponent=null;
+			}
+			tourCourant=oponent;
+	//					sortie=curPerso.attackPhysic(1, oponent);
+		} else {
+			att=oponent._actionPhysic();
+			console.log("Votre adversaire attaque:" + att );
+			def=curPerso._actionPhysic();
+			console.log("Vous esquivez à " + def);
+			if (att>def) {
+				curPerso.plaie= curPerso.plaie + (att-def);
+				console.log("Il vous a infligé " + att-def );
+			}
+			else console.log("Vous esquivez!");
+			if (curPerso.plaie>curPerso.physic) {
+				console.log("Vous ne vous relevez pas et êtes bon pour l'infirmerie");
+				curPerso.X=6;
+				curPerso.Y=1;
+				oponent=null;
+			}
+			tourCourant=curPerso;
+			//			sortie=oponent.attackPhysic(0, curPerso);
+		}	
+ 
+
+	
+
+				
 	}
+	rl.question('Command: ', function (err, answer) {
+		if (answer == 'exit' || answer== 'q' || answer=='quit') //we need some base case, for recursion
+		  return 1; //Exit the program
+		var err;
+			 err=curRoom.process(curPerso, answer);
+	 //   log('Got it! Your answer was: "', answer, '"');
+		recursiveAsyncReadLine(err); //Calling this function again to ask new question, only if answered
+	  
+		  });
+			
+
 };
 
 recursiveAsyncReadLine(null);
