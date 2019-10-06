@@ -4,10 +4,12 @@ const S_1_0 = require("./mymodules/S_1_0.js");
 const S_1_1 = require("./mymodules/S_1_1.js");
 const tools = require("./mymodules/tools.js");
 const Perso = require("./mymodules/Perso.js");
-
+const INIT =0;
+const COMBAT = 1;
+const PARLE =2;
 var rl = require('stdio');
 var log = console.log;
-
+var status= INIT;
 /*
  +----+----+----+
  |1	  |  2 |3	|
@@ -62,6 +64,7 @@ for (var i=0;i<3;i++)
 var curPerso = new Perso(0,1,0,"plone","", 5, 4, 0, 0);
 var rosaly = new Perso(0,2,0,"Rosaly","", 4,5,0,0);
 var annelo = new Perso(0,1,0,"Anne Laure", "Une jeune fille aux longs cheveux noirs de taille moyenne vous observe avec un regard interrogatif, légèrement narquois.", 5,2,0,0); 
+annelo.isAttacker = false;
 // gestion des combats
 var oponent = annelo;
 var tourCourant = null;
@@ -86,67 +89,79 @@ console.log("Temps: " + tools.getTime(timeRef));
 
 
 	} else {
+		if (status == COMBAT ) {
 		//curPerso.X=6;
 		//curPerso.Y=1;
-		console.log("MODE COMBAT");
-		console.log("===========");
-		if (tourCourant ==null) 
-			if (oponent.getMental() > curPerso.getMental()) {
-				tourCourant = oponent;
-			} else if (oponent.getMental() < curPerso.getMental() ){
-				tourCourant = curPerso;
-			} else if (oponent.getMental() == curPerso.getMental() ) {
-				var op=oponent.tossDiceMental();
-				var cur=curPerso.tossDiceMental();
-				while (op==cur) {
-					op=openent.tossDiceMental();
-					cur=curPerso.tossDiceMental();
-				}
-				if (op>cur) 
-				 tourCourant = oponent;
-				else tourCourant = curPerso;
-		}
+			console.log("MODE COMBAT");
+			console.log("===========");
+			if (tourCourant ==null) 
+				if (oponent.getMental() > curPerso.getMental()) {
+					tourCourant = oponent;
+				} else if (oponent.getMental() < curPerso.getMental() ){
+					tourCourant = curPerso;
+				} else if (oponent.getMental() == curPerso.getMental() ) {
+					var op=oponent.tossDiceMental();
+					var cur=curPerso.tossDiceMental();
+					while (op==cur) {
+						op=openent.tossDiceMental();
+						cur=curPerso.tossDiceMental();
+					}
+					if (op>cur) 
+				 		tourCourant = oponent;
+					else tourCourant = curPerso;
+			}
 			// tourCourant est défini
 		
 
 				
-		if (tourCourant==curPerso) {
-			att=curPerso._actionPhysic();
-			console.log("Vous lancez votre attaque:" + att );
-			def=oponent._actionPhysic();
-			console.log("Votre adversaire esquive à " + def);
-			if (att>def) {
-				oponent.plaie= oponent.plaie + (att-def);
-				console.log("Vous infligé " + att-def+ "à votre adversaire");
-			} else 
-				console.log("Votre adversaire esquive votre attaque");
-			if (oponent.plaie>oponent.physic) {
-				console.log("Votre adversaier ne se relève pas et est bon pour l'infirmerie");
-				oponent=null;
-			}
-			tourCourant=oponent;
+			if (tourCourant==curPerso) {
+				att=curPerso._actionPhysic();
+				console.log("Vous lancez votre attaque:" + att );
+				def=oponent._actionPhysic();
+				console.log("Votre adversaire esquive à " + def);
+				if (att>def) {
+					oponent.plaie= oponent.plaie + Math.floor(att-def);
+					console.log("Vous infligé " + Math.floor(att-def)+ "à votre adversaire");
+				} else 
+					console.log("Votre adversaire esquive votre attaque");
+				if (oponent.plaie>oponent.physic) {
+					console.log("Votre adversaire ne se relève pas et est bon pour l'infirmerie");
+					oponent=null;
+					status=null;
+				}
+				tourCourant=oponent;
 	//					sortie=curPerso.attackPhysic(1, oponent);
-		} else {
-			att=oponent._actionPhysic();
-			console.log("Votre adversaire attaque:" + att );
-			def=curPerso._actionPhysic();
-			console.log("Vous esquivez à " + def);
-			if (att>def) {
-				curPerso.plaie= curPerso.plaie + (att-def);
-				console.log("Il vous a infligé " + att-def );
-			}
-			else console.log("Vous esquivez!");
-			if (curPerso.plaie>curPerso.physic) {
-				console.log("Vous ne vous relevez pas et êtes bon pour l'infirmerie");
-				curPerso.X=6;
-				curPerso.Y=1;
-				oponent=null;
-			}
-			tourCourant=curPerso;
+			} else {
+				att=oponent._actionPhysic();
+				console.log("Votre adversaire attaque:" + att );
+				def=curPerso._actionPhysic();
+				console.log("Vous esquivez à " + def);
+				if (att>def) {
+					curPerso.plaie= curPerso.plaie + Math.floor(att-def);
+					console.log("Il vous a infligé " + Math.floor(att-def) );
+				}
+				else console.log("Vous esquivez!");
+				if (curPerso.plaie>curPerso.physic) {
+					console.log("Vous ne vous relevez pas et êtes bon pour l'infirmerie");
+					curPerso.X=6;
+					curPerso.Y=1;
+					oponent=null;
+					status =null;
+				}
+				tourCourant=curPerso;
 			//			sortie=oponent.attackPhysic(0, curPerso);
-		}	
+			}	
  
+		} else if (status == PARLE ) {
 
+		} else if (status == INIT) {
+			if (!oponent.isAttacker )
+				console.log(oponent.name + " vous observe. Que voulez-vous faire? (PARLER ou ATTAQUER)");
+			else {
+				status=COMBAT;
+				recursiveAsyncReadLine(oponent.name + " vous attaque!");
+			}
+		}	
 	
 
 				
@@ -155,7 +170,14 @@ console.log("Temps: " + tools.getTime(timeRef));
 		if (answer == 'exit' || answer== 'q' || answer=='quit') //we need some base case, for recursion
 		  return 1; //Exit the program
 		var err;
+		if (status==null) 
 			 err=curRoom.process(curPerso, answer);
+		else if (status==INIT) {
+			if (answer == "parler" )
+				status= PARLE;
+			else if(answer=="attaquer")
+				status = COMBAT;
+		}
 	 //   log('Got it! Your answer was: "', answer, '"');
 		recursiveAsyncReadLine(err); //Calling this function again to ask new question, only if answered
 	  
