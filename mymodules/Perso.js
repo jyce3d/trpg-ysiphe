@@ -13,6 +13,7 @@ class Perso {
 		this.Y = Y;
 		this.Z = Z;
 		this.descr = descr;
+		this.talkFlow = null;
 	}
 	
 	getMental() {
@@ -32,7 +33,7 @@ class Perso {
 		return this.name;
 	}
 	tossDice(mod) {
-		return (Math.random() * 10) % mod +1;
+		return Math.floor((Math.random() * 10) % mod) +1;
 
 	}
 	tossDiceMental() {
@@ -64,40 +65,15 @@ class Perso {
 		return this.action(this.mental);
 	}
 	attackPhysic(aType, autre) {
-		var att=0;
-		var def=0;
+	
 		if (aType==1) {
-			att=this._actionPhysic();
-			console.log("Vous lancez votre attaque:" + att );
-			def=autre._actionPhysic();
-			console.log("Votre adversaire esquive à " + def);
-			if (att>def) {
-				autre.plaie= autre.plaie + (att-def);
-				console.log("Vous infligé " + att-def+ "à votre adversaire");
-			} else 
-				console.log("Votre adversaire esquive votre attaque");
-			if (autre.plaie>autre.physic) {
-				console.log("Votre adversaier ne se relève pas et est bon pour l'infirmerie");
-				return 1;
-			}
+	
 			rl.question('?',function(err, answer) {
 				
 			});
 			return autre.attackPhysic(0, this);
 		} else {
-			att=this._actionPhysic();
-			console.log("Votre adversaire attaque:" + att );
-			def=autre._actionPhysic();
-			console.log("Vous esquivez à " + def);
-			if (att>def) {
-				autre.plaie= autre.plaie + (att-def);
-				console.log("Il vous a infligé " + att-def );
-			}
-			else console.log("Vous esquivez!");
-			if (autre.plaie>autre.physic) {
-				console.log("Vous ne vous relevez pas et êtes bon pour l'infirmerie");
-				return 2;
-			}
+
 			rl.question('?', function(err, answer) {
 				
 			});

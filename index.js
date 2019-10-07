@@ -4,12 +4,12 @@ const S_1_0 = require("./mymodules/S_1_0.js");
 const S_1_1 = require("./mymodules/S_1_1.js");
 const tools = require("./mymodules/tools.js");
 const Perso = require("./mymodules/Perso.js");
-const INIT =0;
 const COMBAT = 1;
 const PARLE =2;
+const STOPPARLE=4;
 var rl = require('stdio');
 var log = console.log;
-var status= INIT;
+var status= null;
 /*
  +----+----+----+
  |1	  |  2 |3	|
@@ -153,8 +153,9 @@ console.log("Temps: " + tools.getTime(timeRef));
 			}	
  
 		} else if (status == PARLE ) {
-
-		} else if (status == INIT) {
+			console.log(openent.getCurrentTalk());
+			console.log(openent.getCurrentChoices());
+		} else if (status == null) {
 			if (!oponent.isAttacker )
 				console.log(oponent.name + " vous observe. Que voulez-vous faire? (PARLER ou ATTAQUER)");
 			else {
@@ -169,14 +170,18 @@ console.log("Temps: " + tools.getTime(timeRef));
 	rl.question('Command: ', function (err, answer) {
 		if (answer == 'exit' || answer== 'q' || answer=='quit') //we need some base case, for recursion
 		  return 1; //Exit the program
-		var err;
-		if (status==null) 
-			 err=curRoom.process(curPerso, answer);
-		else if (status==INIT) {
-			if (answer == "parler" )
-				status= PARLE;
+		var err=curRoom.process(curPerso, answer);
+
+		if (status==null) {
+		
+			if (answer == "parler" ) {
+				if (status!=STOPPARLE)
+					status= PARLE;
+			}
 			else if(answer=="attaquer")
 				status = COMBAT;
+		} else if (status==PARLE) {
+			status = openent.processAnswer(answer);
 		}
 	 //   log('Got it! Your answer was: "', answer, '"');
 		recursiveAsyncReadLine(err); //Calling this function again to ask new question, only if answered
