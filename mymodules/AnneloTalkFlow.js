@@ -1,11 +1,26 @@
 const Base = require("../mymodules/TalkFlow.js");
 
 class AnneloTalkFlow extends TalkFlow {
-    var talk = new Array[3];
-    talk[0] ="Bonjour, tu es nouveau ici?"
-    choice[0][0] ="1 - Oui, c'est ma première année";
-    choice[0][1] ="2 - Non ,pauvre gamine, je suis ici depuis des années";
+    constructor () {
+        this.talk="Bonjour, tu es nouveau ici?";
+        this.choice[0] ="1 - Oui, c'est ma première année";
+        this.go[0] = 1; // indique l'index vers lequel se diriger
+        this.choice[1] ="2 - Non, pauvre gamine, je suis ici depuis des années.";
+        this.go[1] = 2;
 
+    }
+    executeFlow(choice) {
+        switch (choice) {
+            case 1 : {
+                this.talk="Penses à revoir ton cours de MATH.";
+                this.choice = null;
+                break;
+            }
+            case 2 : {
+                break;
+            }
+        }
+    }
     getCurrentTalk() {
         return talk[this.index];
     }   
