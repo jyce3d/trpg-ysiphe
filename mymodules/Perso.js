@@ -1,13 +1,18 @@
 'use strict';
 var rl = require('stdio');
+
 class Perso {
+	static COMBAT() {return 1;}
+	static PARLE() {return 2;}
+	static STOPPARLE() {return 4;}
+
 	constructor(X,Y,Z,name, descr, mental, physic, plaie, contus) {
 		this.mental = mental;
 		this.physic= physic;
 		this.plaie = plaie;
 		this.contus = contus;
 		this.name = name;
-		this.status =0;
+		this.status =null;
 		this.meta =0;
 		this.X = X;
 		this.Y = Y;

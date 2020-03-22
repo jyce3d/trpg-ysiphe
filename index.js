@@ -4,12 +4,15 @@ const S_1_0 = require("./mymodules/S_1_0.js");
 const S_1_1 = require("./mymodules/S_1_1.js");
 const tools = require("./mymodules/tools.js");
 const Perso = require("./mymodules/Perso.js");
-const COMBAT = 1;
-const PARLE =2;
-const STOPPARLE=4;
+const AnneloTalkFlow = require("./mymodules/AnneloTalkFlow.js");
 var rl = require('stdio');
 var log = console.log;
-var status= null;
+//var status= null; // indique les status de la fonction récursive
+				/* COMBAT => mode combat */
+				/* PARLE => fait parler les personage */
+				// STOPPARLE => le perso ne veut plus parler.
+				/* null => mode normale */
+
 /*
  +----+----+----+
  |1	  |  2 |3	|
@@ -64,7 +67,8 @@ for (var i=0;i<3;i++)
 var curPerso = new Perso(0,1,0,"plone","", 5, 4, 0, 0);
 var rosaly = new Perso(0,2,0,"Rosaly","", 4,5,0,0);
 var annelo = new Perso(0,1,0,"Anne Laure", "Une jeune fille aux longs cheveux noirs de taille moyenne vous observe avec un regard interrogatif, légèrement narquois.", 5,2,0,0); 
-annelo.isAttacker = false;
+annelo.talkFlow = new AnneloTalkFlow(annelo); 
+
 // gestion des combats
 var oponent = annelo;
 var tourCourant = null;
@@ -83,13 +87,13 @@ var recursiveAsyncReadLine = function (err) {
 else
 curRoom=arrRoom_1[curPerso.Y][curPerso.X];
 
-curRoom.display(curPerso, err);
+curRoom.display(curPerso, err); // affiche description, directions possibles
 console.log("Temps: " + tools.getTime(timeRef));
   if (oponent == null ) {
 
 
 	} else {
-		if (status == COMBAT ) {
+		if (oponent.status == Perso.COMBAT() ) {
 		//curPerso.X=6;
 		//curPerso.Y=1;
 			console.log("MODE COMBAT");
@@ -103,7 +107,7 @@ console.log("Temps: " + tools.getTime(timeRef));
 					var op=oponent.tossDiceMental();
 					var cur=curPerso.tossDiceMental();
 					while (op==cur) {
-						op=openent.tossDiceMental();
+						op=oponent.tossDiceMental();
 						cur=curPerso.tossDiceMental();
 					}
 					if (op>cur) 
@@ -115,6 +119,7 @@ console.log("Temps: " + tools.getTime(timeRef));
 
 				
 			if (tourCourant==curPerso) {
+				console.log("Vous attaquez : " +oponent.name)
 				att=curPerso._actionPhysic();
 				console.log("Vous lancez votre attaque:" + att );
 				def=oponent._actionPhysic();
@@ -127,11 +132,12 @@ console.log("Temps: " + tools.getTime(timeRef));
 				if (oponent.plaie>oponent.physic) {
 					console.log("Votre adversaire ne se relève pas et est bon pour l'infirmerie");
 					oponent=null;
-					status=null;
 				}
 				tourCourant=oponent;
 	//					sortie=curPerso.attackPhysic(1, oponent);
 			} else {
+				// Tour d'attaque de l'adversaire
+				console.log(oponent.name + " vous attaque");
 				att=oponent._actionPhysic();
 				console.log("Votre adversaire attaque:" + att );
 				def=curPerso._actionPhysic();
@@ -146,47 +152,49 @@ console.log("Temps: " + tools.getTime(timeRef));
 					curPerso.X=6;
 					curPerso.Y=1;
 					oponent=null;
-					status =null;
+				//	status =null;
 				}
 				tourCourant=curPerso;
 			//			sortie=oponent.attackPhysic(0, curPerso);
 			}	
  
-		} else if (status == PARLE ) {
-			console.log(openent.getCurrentTalk());
-			console.log(openent.getCurrentChoices());
-		} else if (status == null) {
-			if (!oponent.isAttacker )
+		} else if (oponent.status == Perso.PARLE() ) {
+			console.log(oponent.talkFlow.getCurrentTalk());
+			console.log(oponent.talkFlow.getCurrentChoices());
+
+		} else if (oponent.status == null) {
 				console.log(oponent.name + " vous observe. Que voulez-vous faire? (PARLER ou ATTAQUER)");
-			else {
-				status=COMBAT;
-				recursiveAsyncReadLine(oponent.name + " vous attaque!");
-			}
+		} else if (oponent.status == Perso.STOPPARLE()) {
+			console.log(oponent.name + " vous dit qu'il(elle) est occupé(e).");
 		}	
 	
 
 				
 	}
 	rl.question('Command: ', function (err, answer) {
+		var err="";
 		if (answer == 'exit' || answer== 'q' || answer=='quit') //we need some base case, for recursion
 		  return 1; //Exit the program
-		var err=curRoom.process(curPerso, answer);
-
-		if (status==null) {
-		
-			if (answer == "parler" ) {
-				if (status!=STOPPARLE)
-					status= PARLE;
+		if (oponent !=null ) {
+			if (oponent.status==Perso.PARLE()) {
+				oponent.talkFlow.processAnswer(answer);
+			}	else if (oponent.status==null) {
+				if (answer == "parler" || answer== "parle" ) {
+						oponent.status = Perso.PARLE();
+				}	
 			}
-			else if(answer=="attaquer")
-				status = COMBAT;
-		} else if (status==PARLE) {
-			status = openent.processAnswer(answer);
-		}
+			else if(answer=="attaquer" || answer =="attaque")
+				oponent.status = Perso.COMBAT();
+			else
+				err=curRoom.process(curPerso, answer);		 
+		} else // personne dans la pièce mis à part vous
+			 err=curRoom.process(curPerso, answer);
+
+
 	 //   log('Got it! Your answer was: "', answer, '"');
-		recursiveAsyncReadLine(err); //Calling this function again to ask new question, only if answered
-	  
-		  });
+		 recursiveAsyncReadLine(err); //Calling this function again to ask new question, only if answered
+		  
+		});
 			
 
 };

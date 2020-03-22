@@ -6,7 +6,7 @@
 
 class TalkFlow {
     constructor() {
-        this.index =0;
+        this.index=0;
     }
     getCurrentTalk() {
 
