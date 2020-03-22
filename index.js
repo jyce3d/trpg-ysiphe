@@ -98,6 +98,7 @@ console.log("Temps: " + tools.getTime(timeRef));
 		//curPerso.Y=1;
 			console.log("MODE COMBAT");
 			console.log("===========");
+			console.log(oponent.talkFlow.getCurrentTalk());
 			if (tourCourant ==null) 
 				if (oponent.getMental() > curPerso.getMental()) {
 					tourCourant = oponent;
@@ -181,12 +182,14 @@ console.log("Temps: " + tools.getTime(timeRef));
 			}	else if (oponent.status==null) {
 				if (answer == "parler" || answer== "parle" ) {
 						oponent.status = Perso.PARLE();
-				}	
-			}
-			else if(answer=="attaquer" || answer =="attaque")
-				oponent.status = Perso.COMBAT();
-			else
-				err=curRoom.process(curPerso, answer);		 
+				} 
+				else if(answer=="attaquer" || answer =="attaque")
+					oponent.status = Perso.COMBAT();
+				else
+					err=curRoom.process(curPerso, answer);	
+			} else 
+				err=curRoom.process(curPerso, answer);
+				 
 		} else // personne dans la pièce mis à part vous
 			 err=curRoom.process(curPerso, answer);
 

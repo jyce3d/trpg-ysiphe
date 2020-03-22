@@ -1,6 +1,5 @@
 const TalkFlow = require("../mymodules/TalkFlow.js");
-const PARLE =2;
-const COMBAT = 1;
+
 
 class AnneloTalkFlow extends TalkFlow {
     constructor (parent) {
@@ -16,13 +15,18 @@ class AnneloTalkFlow extends TalkFlow {
         this.visit = 0;
     }
     executeFlow(choice) {
-       // console.log(choice);
+        console.log(choice);
         switch (choice) {
+            case "0" : {
+                this.parent.status = TalkFlow.STOPPARLE();
+                break;
+            }
             case "1" : {
                 if ( this.index == 1) {
                     this.talk="Penses à revoir ton cours de MATH.";
                     this.choice = null;
                     this.go = null;
+                    this.parent.status = TalkFlow.PARLE(); 
                     break; 
                 }
             }
@@ -30,8 +34,8 @@ class AnneloTalkFlow extends TalkFlow {
                 if (this.index == 2) {
                     this.talk="Tu ne me fais vraiment pas peur et si c'est ce que tu veux! En garde!";
                     this.choice =null;
-                    this.parent.isAttacker = true;
                     this.go = null;
+                    this.parent.status = TalkFlow.COMBAT();
                     break;
                 }
             }
@@ -64,7 +68,7 @@ class AnneloTalkFlow extends TalkFlow {
             }
         }
         this.executeFlow(answer);
-        return PARLE;
+        
     }
 }
 module.exports = AnneloTalkFlow;
