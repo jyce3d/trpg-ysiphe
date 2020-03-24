@@ -19,6 +19,7 @@ class Perso {
 		this.Z = Z;
 		this.descr = descr;
 		this.talkFlow = null;
+		this.tresorList = new Array();
 	}
 	
 	getMental() {

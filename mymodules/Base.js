@@ -3,26 +3,21 @@
 /* 2019 */
 'use strict';
 const perso = require("../mymodules/Perso.js");
+const tools = require("../mymodules/tools.js");
+const Tresor = require("../mymodules/Tresor.js");
+
 
 class Base {
 	constructor (timeRef) {
 		this.timeRef = timeRef;
+		this.tresorList = new Array();
 	}
 
 	isRecognizedVerb(sa) {
 		if (sa=="va" || sa=="go" || sa=="aller" || sa=="lire") return true;
 	}
 	parseAnswer(answer) {
-		var sa_Answer=answer.split(" ");
-		if (sa_Answer.length>2) 
-			return null;
-
-        var saRet = new Array(2);
-		saRet[0]= sa_Answer[0].toLowerCase();
-		if (sa_Answer.length==2)
-			saRet[1]= sa_Answer[1].toLowerCase();
-		else saRet[1] =null;
-		return saRet;
+		return tools.parse(answer);
 	}
 	displayHeader() {
 		console.clear();
@@ -41,6 +36,16 @@ class Base {
 		for (var i=1;i<=79;i++)
 			sH=sH+"-";
 		console.log(sH);	
+
+		if (this.tresorList.length>0) {
+			console.log("Je VOIS:");
+			sH="";
+			for (var i=0;i<this.tresorList.length; i++) {
+					if (i!=0) sH=sH+" ,";
+					sH=sH+this.tresorList[i].name;
+			}
+			console.log(sH);
+		}
 
 	}
 	getDirection() {
@@ -79,26 +84,49 @@ class Base {
 				curPerso.X=curPerso.X+1;	
 
 			
-			else return "Direction impossible";
+			else err= "Direction impossible";
+			return err;
 		}
+		return "";
 	}
 	onProcess(curPlayer, or1, or2) {
 
 	}
 	process(curPlayer, answer) {
-
+		var err="";
 		var sa=this.parseAnswer(answer);
-		if (sa == null)
-			return "Je ne comprends pas!";
+		if (sa == null) {
+			err = "Je ne comprends pas!";
+			return err;
+		}
 		var ret;
 		var d=this.getDirection();
 		if (this.isDirection(sa[0]))
-			return this.processDirection(curPlayer, sa[0],d);
+			return this.processDirection(curPlayer, sa[0],d, err);
 		if (sa[0] == "aller" || sa[0]=="va" || sa[0]=="go") {
 			if (this.isDirection(sa[1]))
-				return this.processDirection(curPlayer, sa[1],d);
-
+				return this.processDirection(curPlayer, sa[1],d, err);
+ 
+		} else if (sa[0] == "inventaire" || sa[0]== "inv") {
+			err ="Vous transportez:\n";
+			for (var i=0; i<curPlayer.tresorList.length;i++) {
+				if (i!=0) err = err+", ";
+				err = err+curPlayer.tresorList[i].name;
+			}
+			return err;
+		} else if (sa[0] == "prendre") {
+			for (var i=0;i<this.tresorList.length;i++) {
+				if (sa[1].toUpperCase() == this.tresorList[i].name) {
+					err = "J'ai pris " + sa[1].toUpperCase(); 
+					Tresor.pickup(sa[1].toUpperCase(), curPlayer, this);
+					return err;
+				}
+			}
+			err = "Object Inconnu!" + sa[1].toUpperCase();
+			return err;
 		}
+
+
 		return this.onProcess(curPlayer, sa[0], sa[1]);
 	}
 }

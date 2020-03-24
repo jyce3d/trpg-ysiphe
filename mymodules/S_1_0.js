@@ -1,5 +1,8 @@
 const Base = require("../mymodules/Base.js");
 const tools = require("../mymodules/tools.js");
+const Tresor = require("../mymodules/Tresor.js");
+'use strict';
+
 class S_1_0 extends Base {
 	getDirection() {
 		var h=tools.getTime(this.timeRef);
@@ -36,7 +39,14 @@ class S_1_0 extends Base {
 			sRet=sRet+"\nde plus en plus violentes";
 			sRet=sRet+"\n========================================";
 			return sRet;
+		} else if ((or1=="ouvrir") && (or2=="valves")) {
+			var sRet ="La vitre s'ouvre sans difficulté. Quelque chose vient de tomber...";
+			var tr = new Tresor(this, "CLE-M");
+			Tresor.add(tr, this.tresorList);
+			sRet = sRet +" C'est une clé de Myrthe";
+			return sRet;
 		}
+		return "";
 	}
 	
 };

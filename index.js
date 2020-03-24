@@ -1,3 +1,4 @@
+'use strict';
 
 //import { Base } from "mymodules/Base.mjs";
 const S_1_0 = require("./mymodules/S_1_0.js");
@@ -185,13 +186,17 @@ console.log("Temps: " + tools.getTime(timeRef));
 				} 
 				else if(answer=="attaquer" || answer =="attaque")
 					oponent.status = Perso.COMBAT();
-				else
-					err=curRoom.process(curPerso, answer);	
+				else	
+					err = curRoom.process(curPerso, answer);
+					
+					
 			} else 
-				err=curRoom.process(curPerso, answer);
-				 
+				err = curRoom.process(curPerso, answer);
+				
+ 
 		} else // personne dans la pièce mis à part vous
-			 err=curRoom.process(curPerso, answer);
+			err = curRoom.process(curPerso, answer);
+			
 
 
 	 //   log('Got it! Your answer was: "', answer, '"');
