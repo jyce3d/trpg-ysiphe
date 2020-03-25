@@ -11,6 +11,46 @@ class Base {
 	constructor (timeRef) {
 		this.timeRef = timeRef;
 		this.tresorList = new Array();
+		this.oponentList = new Array();
+	}
+	addOponent(perso) {
+		var last = this.oponentList.length;
+		this.oponentList[last] = perso;
+	}
+	getOponent(perso) {
+		for (var i=0; this.oponentList.length; i++) {
+			if (this.oponentList[i].name == perso.name)
+				return this.oponentList[i];
+		}
+		return null;
+	} 
+	getOponentIndex(perso) {
+		for (var i=0; this.oponentList.length; i++) {
+			if (this.oponentList[i].name == perso.name)
+				return i;
+		}
+		return -1;
+	} 
+
+	dropOponent(perso) {
+		var index=this.getOponentIndex(perso);
+		var last = this.oponentList.length;
+		var ret = null;
+		if (index==last-1) {
+			ret = this.oponentList[index-1];
+			this.oponentList.pop();
+		}
+		else {
+			for (var i2=index+1; i2<this.oponentList.length; i2++) {
+				this.oponentList[i2-1] = this.oponentList[i2];
+			}
+			this.oponentList.pop();
+		}
+	}
+	getOponent(){
+		if (this.oponentList.length == 0)
+			return null;
+		else return this.oponentList[0];
 	}
 
 	isRecognizedVerb(sa) {
@@ -79,6 +119,7 @@ class Base {
 		return false;
 	}
 	processDirection(curPerso, sa,d) {
+		var err;
 		if ((sa=="ouest" ) || sa=="o" ) {
 			if ( ((d & 2)==2) && (curPerso.X<3)) 
 				curPerso.X=curPerso.X+1;	

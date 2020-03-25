@@ -71,14 +71,14 @@ var annelo = new Perso(0,1,0,"Anne Laure", "Une jeune fille aux longs cheveux no
 annelo.talkFlow = new AnneloTalkFlow(annelo); 
 
 // gestion des combats
-var oponent = annelo;
+//var oponent = annelo;
 var tourCourant = null;
 ///////
 var timeRef = Date.now();
 arrRoom_0[1][0] = new S_1_0(timeRef);
 arrRoom_0[1][1] = new S_1_1(timeRef);
 
-
+arrRoom_0[1][0].addOponent(annelo);
 var recursiveAsyncReadLine = function (err) {
  // console.log('\033[2J');
  var att =0;
@@ -87,6 +87,9 @@ var recursiveAsyncReadLine = function (err) {
  curRoom=arrRoom_0[curPerso.Y][curPerso.X];
 else
 curRoom=arrRoom_1[curPerso.Y][curPerso.X];
+
+// Manage Opponent
+var oponent = curRoom.getOponent();
 
 curRoom.display(curPerso, err); // affiche description, directions possibles
 console.log("Temps: " + tools.getTime(timeRef));
@@ -133,7 +136,8 @@ console.log("Temps: " + tools.getTime(timeRef));
 					console.log("Votre adversaire esquive votre attaque");
 				if (oponent.plaie>oponent.physic) {
 					console.log("Votre adversaire ne se relève pas et est bon pour l'infirmerie");
-					oponent=null;
+					curRoom.dropOponent(oponent);
+					oponent=curRoom.getOponent();
 				}
 				tourCourant=oponent;
 	//					sortie=curPerso.attackPhysic(1, oponent);
@@ -153,7 +157,6 @@ console.log("Temps: " + tools.getTime(timeRef));
 					console.log("Vous ne vous relevez pas et êtes bon pour l'infirmerie");
 					curPerso.X=6;
 					curPerso.Y=1;
-					oponent=null;
 				//	status =null;
 				}
 				tourCourant=curPerso;
@@ -169,8 +172,6 @@ console.log("Temps: " + tools.getTime(timeRef));
 		} else if (oponent.status == Perso.STOPPARLE()) {
 			console.log(oponent.name + " vous dit qu'il(elle) est occupé(e).");
 		}	
-	
-
 				
 	}
 	rl.question('Command: ', function (err, answer) {
